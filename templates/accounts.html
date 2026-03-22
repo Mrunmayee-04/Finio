@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="page-title mb-0">💳 My Accounts</h4>
+  <span class="text-muted" style="font-size:0.9rem;">
+    <i class="bi bi-info-circle"></i> Update balance anytime
+  </span>
+</div>
+
+<!-- ── Account Type Sections ─────────────────────────────────── -->
+
+{% set types = [
+  ('bank',       '🏦', 'primary',   'Bank Accounts'),
+  ('cash',       '💵', 'success',   'Cash'),
+  ('upi',        '📱', 'info',      'UPI Accounts'),
+  ('credit',     '💳', 'danger',    'Credit Cards'),
+  ('wallet',     '👛', 'warning',   'Wallets'),
+  ('savings',    '🏦', 'secondary', 'Savings & Deposits'),
+  ('investment', '📈', 'dark',      'Investments'),
+] %}
+
+{% for acc_type, icon, color, label in types %}
+
+  {% set type_accounts = accounts | selectattr('type', 'equalto', acc_type) | list %}
+  {% if type_accounts %}
+
+  <div class="mb-4">
+    <h6 class="fw-bold text-muted mb-3">
+      {{ icon }} {{ label }}
+    </h6>
+
+    <div class="row g-3">
+      {% for account in type_accounts %}
+      <div class="col-md-4">
+        <div class="card p-3">
+
+          <!-- Account Header -->
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <p class="fw-bold mb-0">{{ account.name }}</p>
+              <span class="badge bg-{{ color }} mt-1">
+                {{ account.type }}
+              </span>
+            </div>
+            <div class="text-end">
+              <p class="fw-bold mb-0 text-success"
+                 style="font-size:1.1rem;">
+                ₹{{ "%.0f"|format(account.balance) }}
+              </p>
+              <small class="text-muted">current balance</small>
+            </div>
+          </div>
+
+          <!-- Edit Balance Form (Q20) -->
+          <form method="POST"
+                action="/account/edit/{{ account.id }}"
+                class="d-flex gap-2 mt-2">
+            <input type="number"
+                   name="balance"
+                   value="{{ account.balance }}"
+                   class="form-control form-control-sm"
+                   step="0.01"
+                   min="0"
+                   required>
+            <button type="submit"
+                    class="btn btn-finio btn-sm px-3">
+              <i class="bi bi-save"></i>
+            </button>
+          </form>
+
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% endif %}
+{% endfor %}
+
+<!-- ── Total Balance Summary ─────────────────────────────────── -->
+<div class="card p-4 mt-2"
+     style="background: linear-gradient(135deg, #1a1a2e, #16213e);">
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <p class="text-white mb-1" style="opacity:0.7; font-size:0.9rem;">
+        Total across all accounts
+      </p>
+      <h3 class="text-white fw-bold mb-0">
+        ₹{{ "%.0f"|format(accounts | sum(attribute='balance')) }}
+      </h3>
+    </div>
+    <div style="font-size:2.5rem;">💰</div>
+  </div>
+</div>
+
+{% endblock %}

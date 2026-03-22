@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="page-title mb-0">📊 Dashboard</h4>
+  <a href="/add" class="btn btn-finio px-4">
+    <i class="bi bi-plus-circle"></i> Add Transaction
+  </a>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+
+  <div class="col-md-3">
+    <div class="stat-card"
+         style="background: linear-gradient(135deg, #00b894, #00d4aa);">
+      <p><i class="bi bi-arrow-up-circle"></i> Total Income</p>
+      <h3>{{ "%.0f"|format(total_income) }} Rs</h3>
+      <small style="opacity:0.8;">Q1 — SUM income</small>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="stat-card"
+         style="background: linear-gradient(135deg, #d63031, #ff7675);">
+      <p><i class="bi bi-arrow-down-circle"></i> Total Expenses</p>
+      <h3>{{ "%.0f"|format(total_expense) }} Rs</h3>
+      <small style="opacity:0.8;">Q2 — SUM expenses</small>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="stat-card"
+         style="background: linear-gradient(135deg, #0984e3, #74b9ff);">
+      <p><i class="bi bi-wallet2"></i> Net Balance</p>
+      <h3>{{ "%.0f"|format(balance) }} Rs</h3>
+      <small style="opacity:0.8;">Income minus Expenses</small>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="stat-card"
+         style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);">
+      <p><i class="bi bi-receipt"></i> Transactions</p>
+      <h3>{{ txn_count }}</h3>
+      <small style="opacity:0.8;">Q3 — COUNT all</small>
+    </div>
+  </div>
+
+</div>
+
+<!-- Recent Transactions (Q4) -->
+<div class="card p-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0">
+      <i class="bi bi-clock-history"></i> Recent Transactions
+    </h5>
+    <a href="/transactions" class="btn btn-outline-secondary btn-sm">
+      View All
+    </a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Account</th>
+          <th>Category</th>
+          <th>Description</th>
+          <th>Amount</th>
+          <th>Type</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for txn, acc_name, cat_name in recent %}
+        <tr>
+          <td class="text-muted" style="font-size:0.85rem;">{{ txn.id }}</td>
+          <td><i class="bi bi-bank"></i> {{ acc_name }}</td>
+          <td>{{ cat_name }}</td>
+          <td>{{ txn.description }}</td>
+          <td class="fw-bold {{ 'text-success' if txn.type == 'income' else 'text-danger' }}">
+            {{ '+' if txn.type == 'income' else '-' }}
+            {{ "%.0f"|format(txn.amount) }} Rs
+          </td>
+          <td>
+            <span class="badge {{ 'bg-success' if txn.type == 'income' else 'bg-danger' }}">
+              {{ txn.type }}
+            </span>
+          </td>
+          <td class="text-muted" style="font-size:0.85rem;">{{ txn.date }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h4 class="page-title mb-4">🔍 Search Transactions</h4>
+
+<!-- ── Search Form ───────────────────────────────────────────── -->
+<div class="card p-4 mb-4">
+  <form method="GET" action="/search">
+    <div class="input-group">
+      <span class="input-group-text bg-dark text-white border-0">
+        <i class="bi bi-search"></i>
+      </span>
+      <input type="text"
+             name="q"
+             value="{{ keyword }}"
+             class="form-control form-control-lg border-0"
+             placeholder="Search by description e.g. grocery, salary, petrol..."
+             autofocus>
+      <button type="submit" class="btn btn-finio px-4">
+        Search
+      </button>
+    </div>
+  </form>
+
+  <!-- Quick search suggestions -->
+  <div class="mt-3 d-flex flex-wrap gap-2">
+    <small class="text-muted me-1">Try:</small>
+    {% for suggestion in ['salary', 'grocery', 'rent', 'petrol', 'dinner', 'trip'] %}
+    <a href="/search?q={{ suggestion }}"
+       class="badge bg-light text-dark text-decoration-none"
+       style="font-size:0.8rem; padding:6px 10px;">
+      {{ suggestion }}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- ── Search Results ────────────────────────────────────────── -->
+{% if keyword %}
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <p class="text-muted mb-0">
+      Found <strong class="text-dark">{{ results | length }}</strong>
+      result(s) for
+      <strong class="text-dark">"{{ keyword }}"</strong>
+    </p>
+    {% if results %}
+    <small class="text-muted">
+      Total: ₹{{ "%.0f"|format(results | sum(attribute=0) |
+      map(attribute='amount') | sum) }}
+    </small>
+    {% endif %}
+  </div>
+
+  {% if results %}
+  <div class="card p-4">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Account</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for txn, acc_name, cat_name in results %}
+          <tr>
+            <td class="text-muted" style="font-size:0.85rem;">
+              {{ txn.id }}
+            </td>
+            <td>
+              {% if 'credit' in acc_name.lower() %}
+                <i class="bi bi-credit-card text-warning"></i>
+              {% elif 'cash' in acc_name.lower() %}
+                <i class="bi bi-cash text-success"></i>
+              {% elif 'upi' in acc_name.lower() %}
+                <i class="bi bi-phone text-info"></i>
+              {% else %}
+                <i class="bi bi-bank text-primary"></i>
+              {% endif %}
+              {{ acc_name }}
+            </td>
+            <td>
+              <span class="badge bg-secondary">{{ cat_name }}</span>
+            </td>
+            <td>{{ txn.description }}</td>
+            <td class="fw-bold
+              {{ 'text-success' if txn.type == 'income' else 'text-danger' }}">
+              {{ '+' if txn.type == 'income' else '-' }}
+              ₹{{ "%.0f"|format(txn.amount) }}
+            </td>
+            <td>
+              <span class="badge
+                {{ 'bg-success' if txn.type == 'income' else 'bg-danger' }}">
+                {{ txn.type }}
+              </span>
+            </td>
+            <td class="text-muted" style="font-size:0.85rem;">
+              {{ txn.date }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% else %}
+
+  <!-- Empty state -->
+  <div class="card p-5 text-center">
+    <div style="font-size:3rem;">🔎</div>
+    <h5 class="fw-bold mt-3">No results found</h5>
+    <p class="text-muted">
+      No transactions match
+      "<strong>{{ keyword }}</strong>".
+      Try a different keyword.
+    </p>
+    <a href="/search" class="btn btn-outline-secondary btn-sm mx-auto"
+       style="width:fit-content;">
+      Clear Search
+    </a>
+  </div>
+
+  {% endif %}
+
+{% else %}
+
+<!-- Default state — no search yet -->
+<div class="card p-5 text-center">
+  <div style="font-size:3rem;">💡</div>
+  <h5 class="fw-bold mt-3">Search your transactions</h5>
+  <p class="text-muted">
+    Type a keyword above to find any transaction<br>
+    by its description — e.g. "grocery", "salary", "petrol"
+  </p>
+</div>
+
+{% endif %}
+
+{% endblock %}
+```
+
+---
+
+### What's on this page
+
+Quick suggestion pills below the search bar — clicking "salary" or "grocery" instantly searches for that keyword without typing. These are just links to `/search?q=salary` etc.
+
+Three states handled cleanly — no search yet (default welcome state), search with results (table), and search with no results (empty state with a clear button). This is proper UX — never show a blank page.
+
+`autofocus` on the search input — the cursor automatically lands in the search box when you open the page so you can start typing immediately.
+
+Same account icons as `transactions.html` — credit card, cash, UPI, bank — for visual consistency across pages.
+
+---
+
+### All templates are done! ✅
+
+Here's what we have:
+```
+templates/
+├── base.html          ✅
+├── dashboard.html     ✅
+├── transactions.html  ✅
+├── add.html           ✅
+├── accounts.html      ✅
+├── budgets.html       ✅
+├── reports.html       ✅
+└── search.html        ✅

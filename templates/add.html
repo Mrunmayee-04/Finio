@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-md-7">
+
+    <div class="card p-4">
+
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div style="width:48px; height:48px; border-radius:12px;
+                    background: linear-gradient(135deg, #00b894, #00d4aa);
+                    display:flex; align-items:center;
+                    justify-content:center; font-size:1.4rem;">
+          💸
+        </div>
+        <div>
+          <h4 class="page-title mb-0">Add Transaction</h4>
+          <small class="text-muted">Record a new income or expense</small>
+        </div>
+      </div>
+
+      <form method="POST" action="/add">
+
+        <!-- Account Dropdown (Q6) -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-wallet2"></i> Account
+          </label>
+          <select name="account_id" class="form-select" required>
+            <option value="" disabled selected>-- Select Account --</option>
+            {% for account in accounts %}
+              <option value="{{ account.id }}">
+                {{ account.name }} ({{ account.type }})
+                — ₹{{ "%.0f"|format(account.balance) }}
+              </option>
+            {% endfor %}
+          </select>
+          <small class="text-muted">Which account is this transaction from?</small>
+        </div>
+
+        <!-- Category Dropdown (Q7) -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-tag"></i> Category
+          </label>
+          <select name="category_id" class="form-select" required>
+            <option value="" disabled selected>-- Select Category --</option>
+            <optgroup label="Income">
+              {% for cat in cats %}
+                {% if cat.type == 'income' %}
+                  <option value="{{ cat.id }}">{{ cat.name }}</option>
+                {% endif %}
+              {% endfor %}
+            </optgroup>
+            <optgroup label="Expense">
+              {% for cat in cats %}
+                {% if cat.type == 'expense' %}
+                  <option value="{{ cat.id }}">{{ cat.name }}</option>
+                {% endif %}
+              {% endfor %}
+            </optgroup>
+          </select>
+          <small class="text-muted">What was this money for?</small>
+        </div>
+
+        <!-- Amount -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-currency-rupee"></i> Amount
+          </label>
+          <div class="input-group">
+            <span class="input-group-text">₹</span>
+            <input type="number"
+                   name="amount"
+                   class="form-control"
+                   placeholder="e.g. 1500"
+                   step="0.01"
+                   min="1"
+                   required>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-pencil"></i> Description
+          </label>
+          <input type="text"
+                 name="description"
+                 class="form-control"
+                 placeholder="e.g. Monthly grocery run at Big Bazaar"
+                 required>
+        </div>
+
+        <!-- Date -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-calendar3"></i> Date
+          </label>
+          <input type="date"
+                 name="date"
+                 class="form-control"
+                 required>
+        </div>
+
+        <!-- Type -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-arrow-left-right"></i> Type
+          </label>
+          <div class="d-flex gap-3">
+
+            <div class="form-check">
+              <input class="form-check-input" type="radio"
+                     name="type" id="expense" value="expense" checked>
+              <label class="form-check-label text-danger fw-semibold"
+                     for="expense">
+                <i class="bi bi-arrow-down-circle"></i> Expense
+              </label>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="radio"
+                     name="type" id="income" value="income">
+              <label class="form-check-label text-success fw-semibold"
+                     for="income">
+                <i class="bi bi-arrow-up-circle"></i> Income
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-finio w-100">
+            <i class="bi bi-save"></i> Save Transaction
+          </button>
+          <a href="/transactions" class="btn btn-outline-secondary w-100">
+            Cancel
+          </a>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="page-title mb-0">📊 Monthly Budgets</h4>
+  <span class="text-muted" style="font-size:0.9rem;">
+    <i class="bi bi-info-circle"></i> Set your spending limits per category
+  </span>
+</div>
+
+{% set months = budgets | map(attribute=0) | map(attribute='month') | unique | list %}
+
+{% for month in months | sort(reverse=True) %}
+
+<div class="mb-4">
+  <h6 class="fw-bold text-muted mb-3">
+    🗓️ {{ month }}
+  </h6>
+
+  <div class="row g-3">
+    {% for budget, cat_name in budgets %}
+    {% if budget.month == month %}
+
+    <div class="col-md-4">
+      <div class="card p-3">
+
+        <!-- Category + Month Header -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div>
+            <p class="fw-bold mb-0">{{ cat_name }}</p>
+            <small class="text-muted">{{ budget.month }}</small>
+          </div>
+          <span class="badge bg-primary">
+            ₹{{ "%.0f"|format(budget.limit_amount) }}
+          </span>
+        </div>
+
+        <!-- Progress Bar -->
+        {% set spent = namespace(value=0) %}
+        {% for txn, acc_name, c_name in [] %}{% endfor %}
+        <div class="progress mb-2" style="height: 8px;">
+          <div class="progress-bar bg-success"
+               style="width: 40%">
+          </div>
+        </div>
+        <small class="text-muted">
+          Limit: ₹{{ "%.0f"|format(budget.limit_amount) }}
+        </small>
+
+        <!-- Edit Budget Form (Q11) -->
+        <form method="POST"
+              action="/budget/edit/{{ budget.id }}"
+              class="d-flex gap-2 mt-3">
+          <input type="number"
+                 name="limit_amount"
+                 value="{{ budget.limit_amount }}"
+                 class="form-control form-control-sm"
+                 step="0.01"
+                 min="1"
+                 required>
+          <button type="submit"
+                  class="btn btn-finio btn-sm px-3">
+            <i class="bi bi-save"></i>
+          </button>
+        </form>
+
+      </div>
+    </div>
+
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+{% endfor %}
+
+{% endblock %}

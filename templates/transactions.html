@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="page-title mb-0">📋 All Transactions</h4>
+  <a href="/add" class="btn btn-finio px-4">
+    <i class="bi bi-plus-circle"></i> Add New
+  </a>
+</div>
+
+<div class="card p-4">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Account</th>
+          <th>Category</th>
+          <th>Description</th>
+          <th>Amount</th>
+          <th>Type</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for txn, acc_name, cat_name in txns %}
+        <tr>
+          <td class="text-muted" style="font-size:0.85rem;">
+            {{ txn.id }}
+          </td>
+
+          <td>
+            <!-- Account icon changes based on account type -->
+            {% if 'credit' in acc_name.lower() %}
+              <i class="bi bi-credit-card text-warning"></i>
+            {% elif 'cash' in acc_name.lower() %}
+              <i class="bi bi-cash text-success"></i>
+            {% elif 'upi' in acc_name.lower() %}
+              <i class="bi bi-phone text-info"></i>
+            {% else %}
+              <i class="bi bi-bank text-primary"></i>
+            {% endif %}
+            {{ acc_name }}
+          </td>
+
+          <td>
+            <span class="badge bg-secondary">{{ cat_name }}</span>
+          </td>
+
+          <td>{{ txn.description }}</td>
+
+          <td class="fw-bold
+            {{ 'text-success' if txn.type == 'income' else 'text-danger' }}">
+            {{ '+' if txn.type == 'income' else '-' }}₹{{ "%.0f"|format(txn.amount) }}
+          </td>
+
+          <td>
+            <span class="badge
+              {{ 'bg-success' if txn.type == 'income' else 'bg-danger' }}">
+              {{ txn.type }}
+            </span>
+          </td>
+
+          <td class="text-muted" style="font-size:0.85rem;">
+            {{ txn.date }}
+          </td>
+
+          <td>
+            <a href="/delete/{{ txn.id }}"
+               onclick="return confirm('Delete this transaction?')"
+               class="btn btn-outline-danger btn-sm">
+              <i class="bi bi-trash"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+
+        {% if not txns %}
+        <tr>
+          <td colspan="8" class="text-center text-muted py-4">
+            <i class="bi bi-inbox" style="font-size:2rem;"></i><br>
+            No transactions yet. <a href="/add">Add one!</a>
+          </td>
+        </tr>
+        {% endif %}
+
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
