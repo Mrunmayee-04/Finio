@@ -58,25 +58,47 @@ def transactions():
 @app.route('/add', methods=['GET', 'POST'])
 def add_transaction():
     if request.method == 'POST':
+        # 1. Capture the input from the form
+        acc_id = int(request.form['account_id'])
+        amt = float(request.form['amount'])
+        txn_type = request.form['type']
+        
+        # 2. Fetch the specific Account object from the database
+        account = Account.query.get(acc_id)
+
+        # 3. Validation: Check if there is enough money for an expense
+        if txn_type == 'expense' and amt > account.balance:
+            # Use the flash message system already in your base.html
+            flash(f'Insufficient funds in {account.name}! Available balance: ₹{account.balance}', 'danger')
+            return redirect(url_for('add_transaction'))
+
+        # 4. Update the account balance based on transaction type
+        if txn_type == 'income':
+            account.balance += amt
+        else:
+            account.balance -= amt
+
+        # 5. Record the transaction in the database
         new_txn = Transaction(
-            account_id  = int(request.form['account_id']),
+            account_id  = acc_id,
             category_id = int(request.form['category_id']),
-            amount      = float(request.form['amount']),
+            amount      = amt,
             description = request.form['description'],
             date        = datetime.strptime(request.form['date'], '%Y-%m-%d').date(),
-            type        = request.form['type']
+            type        = txn_type
         )
+        
+        # 6. Commit both the new transaction AND the updated account balance
         db.session.add(new_txn)
         db.session.commit()
-        flash('Transaction added successfully!', 'success')
+        
+        flash('Transaction successful and balance updated!', 'success')
         return redirect(url_for('transactions'))
 
-    # Q6: Fetch all accounts for dropdown
+    # Logic for displaying the form
     accounts = Account.query.order_by(Account.name).all()
-    # Q7: Fetch all categories for dropdown
     cats = Category.query.order_by(Category.name).all()
     return render_template('add.html', accounts=accounts, cats=cats)
-
 # ══════════════════════════════════════════════════════════════
 # ROUTE 4 — Delete Transaction (Q8)
 # ══════════════════════════════════════════════════════════════
