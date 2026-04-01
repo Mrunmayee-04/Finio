@@ -46,7 +46,7 @@
     </p>
     {% if results %}
     <small class="text-muted">
-      Total: ₹{{ "%.0f"|format(results | sum(attribute=0) |
+      Total: ₹{{ "%.0f"|format(results | map(attribute=0) | 
       map(attribute='amount') | sum) }}
     </small>
     {% endif %}
@@ -146,30 +146,4 @@
 {% endblock %}
 ```
 
----
 
-### What's on this page
-
-Quick suggestion pills below the search bar — clicking "salary" or "grocery" instantly searches for that keyword without typing. These are just links to `/search?q=salary` etc.
-
-Three states handled cleanly — no search yet (default welcome state), search with results (table), and search with no results (empty state with a clear button). This is proper UX — never show a blank page.
-
-`autofocus` on the search input — the cursor automatically lands in the search box when you open the page so you can start typing immediately.
-
-Same account icons as `transactions.html` — credit card, cash, UPI, bank — for visual consistency across pages.
-
----
-
-### All templates are done! ✅
-
-Here's what we have:
-```
-templates/
-├── base.html          ✅
-├── dashboard.html     ✅
-├── transactions.html  ✅
-├── add.html           ✅
-├── accounts.html      ✅
-├── budgets.html       ✅
-├── reports.html       ✅
-└── search.html        ✅
